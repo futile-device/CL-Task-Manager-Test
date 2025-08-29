@@ -1,13 +1,5 @@
-###################################
-# Task Utility
-#
-# Accepts command line arguments:
-# Commands: add, list, delete
-# Task -> multi word description
-# Due Date ->  in DD/MM/YYYY format
-# Generate a unique ID
-# Store in JSON file
-#
+####################################
+## TASK MaNaGER
 #####################################
 
 # import our libs
@@ -16,138 +8,42 @@ import commands as cmd
 
 # import external libs
 import argparse
-import datetime
+from datetime import datetime
 
-
-##############################
-##
-##  Parse Arguments
-##
-##############################
-
-# TODO: I know there is a more elegant way to handle this
-# what I'd like is --add "My Task" 10/12/2003 where 
-# the --add is a cmd, and argpars forces nargs2 with typing
-# but his was taking me too long to crack :(
+# running task.py with no args   ==> list all tasks yet to be done
+# --add "My Task" 12/12/2025     ==> adds a new task
+# --done 2                       ==> marks ID 2 done
 
 parser = argparse.ArgumentParser(description='Task Manager')
 parser.add_argument('--add', type=str, nargs=2, help='Add task with description and due date DD-MM-YYYY')
 parser.add_argument('--done', type=int, help='Mark task ID as complete')
-# parser.add_argument('--cmd', type=str, action = 'store', dest = 'cmd', help = 'Task manager command')
-# parser.add_argument('--task', type=str, action = 'store', dest = 'task', help = 'Task description')
-# # parser.add_argument('--date', type=str, action = 'store', dest = 'date', help = 'Task due date DD-MM-YYYY')
-# parser.add_argument('--date', type=lambda s: datetime.datetime.strptime(s, '%d-%m-%Y'),  help='Task due date DD-MM-YYYY')
+# parser.add_argument('--all', type=bool, help='List all tasks') # maybe next add way to list all or only done
 
-# Parse the arguments
+
 args = parser.parse_args()
 
-##############################
-##
-##  Handle Arguments
-##
-##############################
-
-# Check commands
-
+# LIST
 if args.add == None and args.done == None:
-    print("List command")
-    all_tasks = cmd.list('tasks.json')
+    # print("List command")
+    all_tasks = cmd.list('tasks.json', False) # True list todo/False list
     quit()
 
+# DONE
 if args.add == None and args.done != None:
-    print("Done command")
+    # print("Done command")
+    cmd.done('tasks.json', args.done)
     quit()
-    
+
+# ADD
 if args.add != None and args.done == None:
-    print("Add command")
+    # print("Add command")
+    # check if date is right format ab/using try/catch
+    try:
+        date_object = datetime.strptime(args.add[1], '%d-%m-%Y') 
+    except:
+        print("Date needs to be in DD-MM-YYYY format")
+        quit()
+    
     cmd.add('tasks.json', args.add[0], args.add[1])
     quit()
 
-##############################
-##
-##  Handle Errors/Args
-##
-##############################
-
-# descr errs: absence of quotes, no task desrc
-# date errs: no date, wrong date format
-
-if args.date == None:
-    print("Please provide a task descriptio and due date!")
-    parser.print_help()
-    quit()
-
-
-
-
-##############################
-##
-##  Load Previous Tasks
-##
-##############################
-
-all_tasks_data = json_utils.loadTaskFromJSON("tasks.json") # TODO: handle different file paths from cmd line
-# print(all_tasks_data)
-
-
-##############################
-##
-##  Create New Task
-##
-##############################
-
-new_task_desc = args.task
-new_task_date = args.date.isoformat()
-new_task_id   = -1  # use later so -1 to indicate no ID yet
-new_task_entry = {}
-new_task_entry['description'] = new_task_desc
-new_task_entry['date'] = new_task_date
-new_task_entry['id'] = new_task_id 
-
-# print(new_task_entry)
-
-# TODO: handle multiple entries, either same descr or same date?
-# TODO: Handle sane dates: is it in the future? in the year 2300 etc
-# TODO: Handle ID with startegy eg., sort by date, hash unique etc
-# here's where I would start by iterating through current entries etc
-
-number_tasks = len(all_tasks_data)
-
-# ID Strategy: ever increasing sequence ie.,
-# since tasks may get deleted, we can 
-# assume that max(id0....idN) + 1 will unique
-
-max_id = 0
-for idx, entry in zip(range(number_tasks), all_tasks_data):
-    max_id = max(idx, max_id)
-
-new_task_id = max_id + 1
-new_task_entry['id'] = new_task_id 
-
-print("Adding new task")
-print(f"Task: {new_task_desc}")
-print(f"Date: {new_task_date}")
-print(f"IDv : {new_task_id}")
-
-all_tasks_data.append(new_task_entry)
-
-
-# show me debug
-
-# for entry in all_tasks_data:
-#     print(entry)
-
-
-
-
-##############################
-##
-##  Save Tasks
-##
-##############################
-
-json_utils.saveTasksToJSON('tasks.json', all_tasks_data)
-    
-
-# no oargs just list only not done by date and id
-# done command marked done
