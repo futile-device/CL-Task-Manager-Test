@@ -7,6 +7,7 @@ import json_utils
 import commands as cmd
 
 # import external libs
+import sys
 import argparse
 from datetime import datetime
 
@@ -15,18 +16,13 @@ from datetime import datetime
 # --done 2                       ==> marks ID 2 done
 
 parser = argparse.ArgumentParser(description='Task Manager')
-group = parser.add_mutually_exclusive_group()
+group = parser.add_mutually_exclusive_group() # make sure only one arg is parsed at a time
 group.add_argument('--add', type=str, nargs=2, help='Add task with description and due date DD-MM-YYYY')
 group.add_argument('--done', type=int, help='Mark task ID as complete')
-# parser.add_argument('--all', type=bool, help='List all tasks') # maybe next add way to list all or only done
-
-
 args = parser.parse_args()
 
 
-if args.add:
-    
-    # print("Add command")
+if args.add != None:
     
     # check: a) is date in correct format
     # and b) the task is not in the past
@@ -45,18 +41,20 @@ if args.add:
     except:
         print("Invalid date, make sure it's in DD-MM-YYYY format")
 
-    quit()
+    sys.exit()
 
-# DONE
-elif args.done:
-    # print("Done command")
+elif args.done != None:
+    
+    # error checking valid task number requires loading
+    # the json, so occurs inside cmd.done function
+
     cmd.done('tasks.json', args.done)
-    quit()
+    sys.exit()
 
 
-else:
-    # print("List command")
+else: # no args provided
+
     all_tasks = cmd.list('tasks.json', False) # True list todo/False list
-    quit()
+    sys.exit()
 
 

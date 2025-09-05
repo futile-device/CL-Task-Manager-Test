@@ -48,7 +48,7 @@ def add(file_path, task_desc, task_date):
 ## LIST all tasks from file
 ###############################
 
-# takes filepath amd option to only
+# takes filepath and option to only
 # list/return tasks that need doing
 def list(file_path, list_all):
     
@@ -57,7 +57,7 @@ def list(file_path, list_all):
     all_tasks = sorted(temp_tasks, key=lambda x: (x['date'], x['id']))
     
     if all_tasks == []:
-        print("No tasks yet!!")
+        print("No tasks yet!! Can't list tasks")
         return None
     
     todo_tasks = []
@@ -83,6 +83,10 @@ def list(file_path, list_all):
 def done(file_path, id_done):
     
     all_tasks = json_utils.loadTaskFromJSON(file_path)
+    
+    if all_tasks == []:
+        print("No tasks yet!! Can't mark done...")
+        return False
     
     task_done = None
     for task in all_tasks:
