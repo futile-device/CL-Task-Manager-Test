@@ -38,7 +38,7 @@ if args.add != None:
         else:
             print("Task date needs to be today or in the future")  
                 
-    except:
+    except ValueError:
         print("Invalid date, make sure it's in DD-MM-YYYY format")
 
     sys.exit()
