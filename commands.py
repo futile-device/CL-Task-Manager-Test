@@ -12,8 +12,15 @@ def printTaskDetail(task):
     print(f"Done: {task['done']}")
     print(f"ID  : {task['id']}")
 
-def printTaskLine(msg, task):
-    print(f"{msg}{task['task']} {task['date']} {task['done']} {task['id']}")
+def printTaskSimple(task):
+    
+    # crop task description to less 
+    # than 15 char for pretty output
+    description = task['task']
+    if len(description) > 15:
+        description = description[:12] + '...'
+    
+    print(f"{description:<15} {task['date']:<12} {'DONE' if task['done'] == True else 'TODO'}     ID: {task['id']}")
 
 ###############################
 ## ADD task to file
@@ -45,7 +52,6 @@ def add(file_path, task_desc, task_date):
     
     json_utils.saveTasksToJSON('tasks.json', all_tasks)
     
-    #printTaskLine("Added new task: ", new_task_entry)
     print("Adding new task:")
     printTaskDetail(new_task_entry)
     
@@ -73,13 +79,15 @@ def list(file_path, list_all):
 
     todo_tasks = []
     
+    print("Task            Date         Status   ID")
+    print("===========================================")
     if list_all:
-        for task in all_tasks: printTaskLine("Task: ", task)
+        for task in all_tasks: printTaskSimple(task)
         return all_tasks
     else: # only list tasks that need doing
         for task in all_tasks:
             if task['done'] != True: 
-                printTaskLine("TODO: ", task)
+                printTaskSimple(task)
                 todo_tasks.append(task)
         return todo_tasks
 
@@ -113,7 +121,8 @@ def done(file_path, id_done):
             break
     
     if task_done != None:
-        printTaskLine("Marked done: ", task_done)
+        print("Marked task done:")
+        printTaskDetail(task_done)
         json_utils.saveTasksToJSON('tasks.json', all_tasks)
         return True
     else:
