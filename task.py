@@ -23,17 +23,28 @@ group.add_argument('--done', type=int, help='Mark task ID as complete')
 
 args = parser.parse_args()
 
-# LIST
+
 if args.add:
-    # print("Add command")
-    # check if date is right format ab/using try/catch
-    try:
-        date_object = datetime.strptime(args.add[1], '%d-%m-%Y') 
-    except:
-        print("Date needs to be in DD-MM-YYYY format")
-        quit()
     
-    cmd.add('tasks.json', args.add[0], args.add[1])
+    # print("Add command")
+    
+    # check: a) is date in correct format
+    # and b) the task is not in the past
+    
+    try:
+
+        # this will throw an error if invalid date
+        task_date = datetime.strptime(args.add[1], '%d-%m-%Y') 
+
+        # for now only comparing date, not hour
+        if task_date.date() >= datetime.today().date(): 
+            cmd.add('tasks.json', args.add[0], args.add[1])
+        else:
+            print("Task date needs to be today or in the future")  
+                
+    except:
+        print("Invalid date, make sure it's in DD-MM-YYYY format")
+
     quit()
 
 # DONE
