@@ -12,6 +12,7 @@ import argparse
 from datetime import datetime
 
 # running task.py with no args   ==> list all tasks yet to be done
+# --all                          ==> list all tasks even those that are done
 # --add "My Task" 12/12/2025     ==> adds a new task
 # --done 2                       ==> marks ID 2 done
 
@@ -19,6 +20,7 @@ parser = argparse.ArgumentParser(description='Task Manager')
 group = parser.add_mutually_exclusive_group() # make sure only one arg is parsed at a time
 group.add_argument('--add', type=str, nargs=2, help='Add task with description and due date DD-MM-YYYY')
 group.add_argument('--done', type=int, help='Mark task ID as complete')
+group.add_argument('--all', action='store_true', help='List all tasks even if done')
 args = parser.parse_args()
 
 
@@ -51,10 +53,14 @@ elif args.done != None:
     cmd.done('tasks.json', args.done)
     sys.exit()
 
+elif args.all == True:
+
+    all_tasks = cmd.list('tasks.json', True) # list all tasks even those done
+    sys.exit()
 
 else: # no args provided
 
-    all_tasks = cmd.list('tasks.json', False) # True list todo/False list
+    all_tasks = cmd.list('tasks.json', False) # list all tasks that need doing
     sys.exit()
 
 
