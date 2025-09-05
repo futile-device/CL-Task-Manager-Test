@@ -15,27 +15,16 @@ from datetime import datetime
 # --done 2                       ==> marks ID 2 done
 
 parser = argparse.ArgumentParser(description='Task Manager')
-parser.add_argument('--add', type=str, nargs=2, help='Add task with description and due date DD-MM-YYYY')
-parser.add_argument('--done', type=int, help='Mark task ID as complete')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--add', type=str, nargs=2, help='Add task with description and due date DD-MM-YYYY')
+group.add_argument('--done', type=int, help='Mark task ID as complete')
 # parser.add_argument('--all', type=bool, help='List all tasks') # maybe next add way to list all or only done
 
 
 args = parser.parse_args()
 
 # LIST
-if args.add == None and args.done == None:
-    # print("List command")
-    all_tasks = cmd.list('tasks.json', False) # True list todo/False list
-    quit()
-
-# DONE
-if args.add == None and args.done != None:
-    # print("Done command")
-    cmd.done('tasks.json', args.done)
-    quit()
-
-# ADD
-if args.add != None and args.done == None:
+if args.add:
     # print("Add command")
     # check if date is right format ab/using try/catch
     try:
@@ -46,4 +35,17 @@ if args.add != None and args.done == None:
     
     cmd.add('tasks.json', args.add[0], args.add[1])
     quit()
+
+# DONE
+elif args.done:
+    # print("Done command")
+    cmd.done('tasks.json', args.done)
+    quit()
+
+
+else:
+    # print("List command")
+    all_tasks = cmd.list('tasks.json', False) # True list todo/False list
+    quit()
+
 
